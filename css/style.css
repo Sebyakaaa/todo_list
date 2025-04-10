@@ -1,0 +1,143 @@
+html{
+  box-sizing: border-box;
+}
+
+*,
+*::after,
+*::before{
+  box-sizing: inherit;
+}
+
+@font-face {
+  font-family: 'Graphik LC Web';
+  src: url('/fonts/graphiklcweb_medium.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, p{
+  margin: 0;
+}
+
+body{
+  font-family: 'Graphik LC Web', sans-serif;
+  background-color: rgb(236, 226, 226);
+}
+
+button:hover{
+  cursor: pointer;
+}
+
+h1{
+  font-size: 18px;
+}
+
+.block{
+  text-align: center;
+  margin-top: 100px;
+  font-size: 14px;
+}
+
+.container{
+  display: inline-flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.title{
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.title__tick{
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.title__tick img{
+  padding-top: 2px;
+  width: 100%;
+}
+
+.add-new{
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 0 8px;
+}
+
+.add-new__field{
+  flex-grow: 1;
+}
+
+.add-new__field::placeholder{
+  font-weight: 400;
+}
+
+.add-new__btn{
+  flex-grow: 0;
+  background-color: #248567;
+  color: white;
+  padding: 7.5px 12px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  justify-content: center;
+  align-items: center;
+}
+
+.task-list__item{
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  gap: 0 8px;
+}
+
+.task-list__unit{
+  display: flex;
+  gap: 0 8px;
+}
+
+.task-list__checkbox{
+  justify-self: center;
+  align-self: center;
+}
+
+.task-list__checkbox:hover{
+  cursor: pointer;
+}
+
+.task-list__text{
+  width: 300px;
+  text-align: start;
+  align-self: center;
+  padding: 7.5px 8px;
+  font-weight: 400;
+}
+
+.task-list__text:hover{
+  cursor: pointer;
+  outline: 1px solid #d1d1d1;
+  border-radius: 2px;
+}
+
+.task-list__text:focus{
+  outline: 1px solid #248567;
+  border-radius: 2px;
+}
+
+.task-list__checkbox:checked + .task-list__text {
+  text-decoration: line-through;
+  color: #767676; 
+}
