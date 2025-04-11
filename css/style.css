@@ -52,6 +52,8 @@ h1{
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .title{
@@ -60,18 +62,18 @@ h1{
 }
 
 .title__tick{
+  background-image: url(../images/tick.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  transform: translateY(-2px);
   width: 24px;
   height: 24px;
   margin-right: 8px;
 }
 
-.title__tick img{
-  padding-top: 2px;
-  width: 100%;
-}
-
 .add-new{
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   gap: 0 8px;
@@ -109,8 +111,7 @@ h1{
 .task-list__item{
   display: flex;
   justify-content: space-between;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  margin-bottom: 16px;
   gap: 0 8px;
 }
 
@@ -141,7 +142,7 @@ h1{
   display: inline-block;
   position: relative;
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s; /
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .task-list__checkbox:hover{
@@ -195,4 +196,6 @@ h1{
   background-color: transparent;
   border: none;
   padding: 0;
+  align-self: flex-start;
+  margin-top: 6px;
 }
