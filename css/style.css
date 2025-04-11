@@ -36,6 +36,7 @@ button:hover{
 
 h1{
   font-size: 18px;
+  font-weight: bold;
 }
 
 .block{
@@ -78,10 +79,19 @@ h1{
 
 .add-new__field{
   flex-grow: 1;
+  border: 1px solid #d1d1d1;
+  border-radius: 2px;
+  padding: 8px;
+}
+
+.add-new__field:focus{
+  outline: none;
+  border-color: #248567;
 }
 
 .add-new__field::placeholder{
   font-weight: 400;
+  padding: 8px 0;
 }
 
 .add-new__btn{
@@ -107,15 +117,54 @@ h1{
 .task-list__unit{
   display: flex;
   gap: 0 8px;
+  position: relative;
 }
 
 .task-list__checkbox{
-  justify-self: center;
-  align-self: center;
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 0;
+  left: 0;
+  margin-top: 6px;
+  padding: 0;
+  opacity: 0; 
+  z-index: 2;
+}
+
+.task-list__checkbox-style{
+  margin-top: 6px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgb(173, 173, 173);
+  border-radius: 3px;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s; /
 }
 
 .task-list__checkbox:hover{
   cursor: pointer;
+}
+
+/* чекбокс отмечен */
+.task-list__checkbox:checked + .task-list__checkbox-style {
+  background-color: #248567;
+  border-color: #248567;
+}
+
+/* Галочка при активном чекбоксе */
+.task-list__checkbox:checked + .task-list__checkbox-style::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 3px;
+  width: 8px;
+  height: 14px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg); /* Поворот для галочки */
 }
 
 .task-list__text{
@@ -137,7 +186,13 @@ h1{
   border-radius: 2px;
 }
 
-.task-list__checkbox:checked + .task-list__text {
+.task-list__checkbox:checked ~ .task-list__text {
   text-decoration: line-through;
   color: #767676; 
+}
+
+.task-list__delete{
+  background-color: transparent;
+  border: none;
+  padding: 0;
 }
