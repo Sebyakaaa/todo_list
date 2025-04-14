@@ -43,7 +43,7 @@ addTaskBtn.addEventListener('click', () => {
 
 taskList.addEventListener('click', (event) => {
   // Удаление задачи
-  if (event.target.closest(`.${DELETE_BTN}`)) {
+  if (event.target.classList.contains(DELETE_BTN)) {
     const taskItem = event.target.closest(`.${TASK_ITEM}`);
     taskItem.remove();
   }
