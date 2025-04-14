@@ -22,9 +22,7 @@ function createTaskItem(taskText, taskId) {
         </div>
         <span contenteditable="true" class="task-list__text">${taskText}</span>
       </div>  
-      <button class="${DELETE_BTN}" type="button">
-        <img src="images/delete.svg" alt="">
-      </button>
+      <button class="${DELETE_BTN}" type="button"></button>
     </li>
   `;
 }
