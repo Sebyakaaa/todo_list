@@ -5,6 +5,7 @@ const loader = document.querySelector('.loader');
 
 const TASK_ITEM = 'task-list__item';
 const CHECKBOX_CTRL = 'checkbox__control';
+const TASK_TEXT = 'task-list__text';
 const DELETE_BTN = 'task-list__delete';
 
 // Функция для генерации случайного ID
@@ -112,7 +113,7 @@ taskList.addEventListener('click', async (event) => {
       console.error(error);
     }
 
-    return; // вызходим чтобы дальше не проверяло на удаление
+    return; // выходим чтобы дальше не проверяло на удаление
   }
 
   // Удаление задачи
@@ -147,6 +148,36 @@ taskList.addEventListener('click', async (event) => {
     } else return;
   }
 });
+
+
+// Апдейт текста задачи
+taskList.addEventListener('blur', async (event) => {
+  if (event.target.classList.contains(TASK_TEXT)) {
+    const taskItem = event.target.closest(`.${TASK_ITEM}`);
+    const taskId = taskItem.dataset.id;
+    const newText = event.target.textContent.trim(); // textContent возвращает текст внутри элемента, который отредактировал юзер
+
+    if (!taskId) return;
+
+    try {
+      const response = await fetch(`https://dummyjson.com/todos/${taskId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ todo: newText })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update task text');
+      }
+
+    } catch (error) {
+      alert('Failed to update task text');
+      console.error(error);
+    }
+  }
+}, true); // true (включает режим захвата) чтобы обработчик увидел blur
 
 // Функция для загрузки задач с сервера
 async function loadTodosFromAPI() {
