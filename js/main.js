@@ -122,9 +122,9 @@ taskList.addEventListener('click', async (event) => {
 
     if (!taskId) return;
 
-    const response = confirm('Do you want to delete this item?');
+    const userConfirm = confirm('Do you want to delete this item?');
 
-    if (response) {
+    if (userConfirm) {
       showLoader();
       // Скрыть визуально
       taskItem.remove();
