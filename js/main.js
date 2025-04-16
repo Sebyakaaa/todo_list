@@ -187,12 +187,27 @@ async function handleDeleteClick(event) {
   }
 }
 
-// Вызов функции при загрузке страницы
+function registerEventListeners() {
+  addTaskBtn.addEventListener('click', handleAddTaskClick);
+  taskList.addEventListener('click', handleCheckboxClick);
+  taskList.addEventListener('blur', handleTaskEditBlur, true);
+  taskList.addEventListener('click', handleDeleteClick);
+}
+
+function removeEventListeners() {
+  addTaskBtn.removeEventListener('click', handleAddTaskClick);
+  taskList.removeEventListener('click', handleCheckboxClick);
+  taskList.removeEventListener('blur', handleTaskEditBlur, true);
+  taskList.removeEventListener('click', handleDeleteClick);
+}
+
+// Подписка при загрузке
 document.addEventListener('DOMContentLoaded', () => {
   loadTodosFromAPI();
+  registerEventListeners();
 });
 
-addTaskBtn.addEventListener('click', handleAddTaskClick);
-taskList.addEventListener('click', handleCheckboxClick);
-taskList.addEventListener('blur', handleTaskEditBlur, true);
-taskList.addEventListener('click', handleDeleteClick);
+// Отписка при закрытии/обновлении страницы
+window.addEventListener('beforeunload', () => {
+  removeEventListeners();
+});
