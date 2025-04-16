@@ -75,28 +75,18 @@ addTaskBtn.addEventListener('click', async () => {
   }
 });
 
-taskList.addEventListener('click', async (event) => { //Event Delegation - слушаем любой клик по листу и дальше смотрим что за он
-  // Обработка клика по чекбоксу
-  // Event Bubbling
-  if (event.target.classList.contains(CHECKBOX_CTRL)) { //проверяем что нажали именно а чекбокс
-    const checkbox = event.target; //сохраняем DOM элемент чекбокса
-    const taskItem = checkbox.closest(`.${TASK_ITEM}`); // ищем ближайшего родителя (сам айтем)
-    const taskId = taskItem.dataset.id; // берем айдишник айтема
+async function handleCheckboxClick(event) {
+  if (event.target.classList.contains(CHECKBOX_CTRL)) {
+    const checkbox = event.target;
+    const taskItem = checkbox.closest(`.${TASK_ITEM}`);
+    const taskId = taskItem.dataset.id;
 
-    if (!taskId) return; // убеждаемся что нам отдали айдишник
+    if (!taskId) return;
 
-    const isChecked = checkbox.checked; // смотрим состояние чекбокса
+    const isChecked = checkbox.checked;
 
-    // Обновляем UI
     taskItem.classList.toggle('completed', isChecked);
-    // то же самое что:
-    // if (isChecked) {
-    //   taskItem.classList.add('completed');
-    // } else {
-    //   taskItem.classList.remove('completed');
-    // }
-  
-    // Отправляем запрос на сервер
+
     try {
       const response = await fetch(`https://dummyjson.com/todos/${taskId}`, {
         method: 'PUT',
@@ -105,7 +95,7 @@ taskList.addEventListener('click', async (event) => { //Event Delegation - сл�
         },
         body: JSON.stringify({ completed: isChecked })
       });
-    
+
       if (!response.ok) {
         throw new Error('Failed to update task');
       }
@@ -113,44 +103,41 @@ taskList.addEventListener('click', async (event) => { //Event Delegation - сл�
       alert('Failed to update checkbox status');
       console.error(error);
     }
-
-    return; // выходим чтобы дальше не проверяло на удаление
   }
+}
 
-  // Удаление задачи
-  // Event Bubbling
+async function handleDeleteClick(event) {
   if (event.target.classList.contains(DELETE_BTN)) { 
     const taskItem = event.target.closest(`.${TASK_ITEM}`);
-    const taskId = taskItem.dataset.id; // dataset дает доступ ко всем атрибутам элемента
+    const taskId = taskItem.dataset.id;
 
     if (!taskId) return;
 
     const userConfirm = confirm('Do you want to delete this item?');
+    if (!userConfirm) return;
 
-    if (userConfirm) {
-      showLoader();
-      // Скрыть визуально
-      taskItem.remove();
+    showLoader();
+    taskItem.remove();
 
-      // Удаление с сервера
-      try {
-        const response = await fetch(`https://dummyjson.com/todos/${taskId}`, {
-          method: 'DELETE',
-        });
+    try {
+      const response = await fetch(`https://dummyjson.com/todos/${taskId}`, {
+        method: 'DELETE'
+      });
 
-        if (!response.ok) { //ошибки с сервера
-          throw new Error('Failed to delete');
-        }
-      } catch (error) { //сетевые и синтаксические ошибки
-        alert('Deletion error');
-        console.error(error);
-      } finally {
-        hideLoader();
+      if (!response.ok) {
+        throw new Error('Failed to delete');
       }
-    } else return;
+    } catch (error) {
+      alert('Deletion error');
+      console.error(error);
+    } finally {
+      hideLoader();
+    }
   }
-});
+}
 
+taskList.addEventListener('click', handleCheckboxClick);
+taskList.addEventListener('click', handleDeleteClick);
 
 // Апдейт текста задачи
 // Event Capturing
