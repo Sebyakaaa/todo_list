@@ -75,8 +75,9 @@ addTaskBtn.addEventListener('click', async () => {
   }
 });
 
-taskList.addEventListener('click', async (event) => {
+taskList.addEventListener('click', async (event) => { //Event Delegation - слушаем любой клик по листу и дальше смотрим что за он
   // Обработка клика по чекбоксу
+  // Event Bubbling
   if (event.target.classList.contains(CHECKBOX_CTRL)) { //проверяем что нажали именно а чекбокс
     const checkbox = event.target; //сохраняем DOM элемент чекбокса
     const taskItem = checkbox.closest(`.${TASK_ITEM}`); // ищем ближайшего родителя (сам айтем)
@@ -117,6 +118,7 @@ taskList.addEventListener('click', async (event) => {
   }
 
   // Удаление задачи
+  // Event Bubbling
   if (event.target.classList.contains(DELETE_BTN)) { 
     const taskItem = event.target.closest(`.${TASK_ITEM}`);
     const taskId = taskItem.dataset.id; // dataset дает доступ ко всем атрибутам элемента
@@ -151,6 +153,7 @@ taskList.addEventListener('click', async (event) => {
 
 
 // Апдейт текста задачи
+// Event Capturing
 taskList.addEventListener('blur', async (event) => {
   if (event.target.classList.contains(TASK_TEXT)) {
     const taskItem = event.target.closest(`.${TASK_ITEM}`);
