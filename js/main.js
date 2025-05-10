@@ -8,17 +8,32 @@ const CHECKBOX_CTRL = 'checkbox__control';
 const TASK_TEXT = 'task-list__text';
 const DELETE_BTN = 'task-list__delete';
 
-// Функция для генерации случайного ID
-// function generateId() {
-//   return Math.floor(Math.random() * 1000000);
-// }
-
 function showLoader() {
   loader.hidden = false;
 }
 
 function hideLoader() {
   loader.hidden = true;
+}
+
+// загрузка задач с сервера
+async function loadTodosFromAPI() {
+  showLoader();
+
+  try {
+    const response = await fetch('https://dummyjson.com/todos');
+    const data = await response.json();
+    const todos = data.todos;
+
+    todos.forEach(todo => {
+      const taskItem = createTaskItem(todo.todo, todo.id, todo.completed);
+      taskList.insertAdjacentHTML('beforeend', taskItem); // добавление в конец
+    });
+  } catch (error) {
+    console.error('Loading error', error);
+  } finally {
+    hideLoader();
+  }
 }
 
 // Отображение списка задач
@@ -40,10 +55,10 @@ function createTaskItem(taskText, taskId, isCompleted = false) {
   `;
 }
 
-// Добавление задачи
-addTaskBtn.addEventListener('click', async () => {
+// Добавление новой задачи
+async function handleAddTaskClick(event) {
   const taskText = taskInput.value.trim();
-  if (!taskText) return;   // if (taskText !== '') {}
+  if (!taskText) return;
 
   showLoader();
   addTaskBtn.disabled = true;
@@ -62,10 +77,9 @@ addTaskBtn.addEventListener('click', async () => {
     });
 
     const newTodo = await response.json();
+    
+    renderTaskItem(newTodo);
 
-    // Рендерим новый todo
-    const taskItem = createTaskItem(newTodo.todo, newTodo.id, newTodo.completed);
-    taskList.insertAdjacentHTML('afterbegin', taskItem); // добавление в начало
     taskInput.value = '';
   } catch (error) {
     console.error('Can not add an item', error);
@@ -73,30 +87,27 @@ addTaskBtn.addEventListener('click', async () => {
     hideLoader();
     addTaskBtn.disabled = false;
   }
-});
+}
 
-taskList.addEventListener('click', async (event) => { //Event Delegation - слушаем любой клик по листу и дальше смотрим что за он
-  // Обработка клика по чекбоксу
-  // Event Bubbling
-  if (event.target.classList.contains(CHECKBOX_CTRL)) { //проверяем что нажали именно а чекбокс
-    const checkbox = event.target; //сохраняем DOM элемент чекбокса
-    const taskItem = checkbox.closest(`.${TASK_ITEM}`); // ищем ближайшего родителя (сам айтем)
-    const taskId = taskItem.dataset.id; // берем айдишник айтема
+//отображение новой задачи в списке
+async function renderTaskItem(newTodo) {
+    const taskItem = createTaskItem(newTodo.todo, newTodo.id, newTodo.completed);
+    taskList.insertAdjacentHTML('afterbegin', taskItem);
+}
 
-    if (!taskId) return; // убеждаемся что нам отдали айдишник
+// Комплит задачи
+async function handleCheckboxClick(event) {
+  if (event.target.classList.contains(CHECKBOX_CTRL)) {
+    const checkbox = event.target;
+    const taskItem = checkbox.closest(`.${TASK_ITEM}`);
+    const taskId = taskItem.dataset.id;
 
-    const isChecked = checkbox.checked; // смотрим состояние чекбокса
+    if (!taskId) return;
 
-    // Обновляем UI
+    const isChecked = checkbox.checked;
+
     taskItem.classList.toggle('completed', isChecked);
-    // то же самое что:
-    // if (isChecked) {
-    //   taskItem.classList.add('completed');
-    // } else {
-    //   taskItem.classList.remove('completed');
-    // }
-  
-    // Отправляем запрос на сервер
+
     try {
       const response = await fetch(`https://dummyjson.com/todos/${taskId}`, {
         method: 'PUT',
@@ -105,7 +116,7 @@ taskList.addEventListener('click', async (event) => { //Event Delegation - сл�
         },
         body: JSON.stringify({ completed: isChecked })
       });
-    
+
       if (!response.ok) {
         throw new Error('Failed to update task');
       }
@@ -113,52 +124,15 @@ taskList.addEventListener('click', async (event) => { //Event Delegation - сл�
       alert('Failed to update checkbox status');
       console.error(error);
     }
-
-    return; // выходим чтобы дальше не проверяло на удаление
   }
-
-  // Удаление задачи
-  // Event Bubbling
-  if (event.target.classList.contains(DELETE_BTN)) { 
-    const taskItem = event.target.closest(`.${TASK_ITEM}`);
-    const taskId = taskItem.dataset.id; // dataset дает доступ ко всем атрибутам элемента
-
-    if (!taskId) return;
-
-    const userConfirm = confirm('Do you want to delete this item?');
-
-    if (userConfirm) {
-      showLoader();
-      // Скрыть визуально
-      taskItem.remove();
-
-      // Удаление с сервера
-      try {
-        const response = await fetch(`https://dummyjson.com/todos/${taskId}`, {
-          method: 'DELETE',
-        });
-
-        if (!response.ok) { //ошибки с сервера
-          throw new Error('Failed to delete');
-        }
-      } catch (error) { //сетевые и синтаксические ошибки
-        alert('Deletion error');
-        console.error(error);
-      } finally {
-        hideLoader();
-      }
-    } else return;
-  }
-});
-
+}
 
 // Апдейт текста задачи
-// Event Capturing
-taskList.addEventListener('blur', async (event) => {
+async function handleTaskEditBlur(event) {
   if (event.target.classList.contains(TASK_TEXT)) {
     const taskItem = event.target.closest(`.${TASK_ITEM}`);
     const taskId = taskItem.dataset.id;
-    const newText = event.target.textContent.trim(); // textContent возвращает текст внутри элемента, который отредактировал юзер
+    const newText = event.target.textContent.trim();
 
     if (!taskId) return;
 
@@ -180,29 +154,60 @@ taskList.addEventListener('blur', async (event) => {
       console.error(error);
     }
   }
-}, true); // true (включает режим захвата) чтобы обработчик увидел blur
+}
 
-// Функция для загрузки задач с сервера
-async function loadTodosFromAPI() {
-  showLoader();
+// удаление задачи
+async function handleDeleteClick(event) {
+  if (event.target.classList.contains(DELETE_BTN)) { 
+    const taskItem = event.target.closest(`.${TASK_ITEM}`);
+    const taskId = taskItem.dataset.id;
 
-  try {
-    const response = await fetch('https://dummyjson.com/todos');
-    const data = await response.json();
-    const todos = data.todos;
+    if (!taskId) return;
 
-    todos.forEach(todo => {
-      const taskItem = createTaskItem(todo.todo, todo.id, todo.completed);
-      taskList.insertAdjacentHTML('beforeend', taskItem); // добавление в конец
-    });
-  } catch (error) {
-    console.error('Loading error', error);
-  } finally {
-    hideLoader();
+    const userConfirm = confirm('Do you want to delete this item?');
+    if (!userConfirm) return;
+
+    showLoader();
+    taskItem.remove();
+
+    try {
+      const response = await fetch(`https://dummyjson.com/todos/${taskId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete');
+      }
+    } catch (error) {
+      alert('Deletion error');
+      console.error(error);
+    } finally {
+      hideLoader();
+    }
   }
 }
 
-// Вызов функции при загрузке страницы
+function registerEventListeners() {
+  addTaskBtn.addEventListener('click', handleAddTaskClick);
+  taskList.addEventListener('click', handleCheckboxClick);
+  taskList.addEventListener('blur', handleTaskEditBlur, true);
+  taskList.addEventListener('click', handleDeleteClick);
+}
+
+function removeEventListeners() {
+  addTaskBtn.removeEventListener('click', handleAddTaskClick);
+  taskList.removeEventListener('click', handleCheckboxClick);
+  taskList.removeEventListener('blur', handleTaskEditBlur, true);
+  taskList.removeEventListener('click', handleDeleteClick);
+}
+
+// Подписка при загрузке
 document.addEventListener('DOMContentLoaded', () => {
   loadTodosFromAPI();
+  registerEventListeners();
+});
+
+// Отписка при закрытии/обновлении страницы
+window.addEventListener('beforeunload', () => {
+  removeEventListeners();
 });
